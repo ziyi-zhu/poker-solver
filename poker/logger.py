@@ -322,46 +322,52 @@ class ConsoleLogger:
 
     def display_simulation_stats(self, stats: Dict[str, Any]) -> None:
         """
-        Display simulation statistics.
-
-        Args:
-            stats: Dictionary containing simulation statistics
+        Display simulation statistics in a formatted way
         """
-        print("=" * 80)
-        print("SIMULATION STATISTICS")
-        print("=" * 80)
+        self.info("=" * 80)
+        self.info("SIMULATION STATISTICS")
+        self.info("=" * 80)
+        self.info(f"Total hands played: {stats['hands_played']}")
+        self.info(f"Total showdowns: {stats['showdowns']}")
+        self.info(f"Largest pot: ${stats['biggest_pot']}")
+        self.info("")
 
-        # Game stats
-        print(f"Total hands played: {stats['hands_played']}")
-        print(f"Total showdowns: {stats['showdowns']}")
-        print(f"Largest pot: {self._format_chips(stats['biggest_pot'])}")
-        print("")
-
-        # Action stats
-        print("Player Actions:")
-        print(f"  Folds:   {stats['folds']}")
-        print(f"  Checks:  {stats['checks']}")
-        print(f"  Calls:   {stats['calls']}")
-        print(f"  Bets:    {stats['bets']}")
-        print(f"  Raises:  {stats['raises']}")
-        print(f"  All-ins: {stats['all_ins']}")
-        print("")
-
-        # Player results
-        print("Final Results:")
-        for player_name, wins in stats["player_wins"].items():
-            win_percentage = (
-                (wins / stats["hands_played"] * 100) if stats["hands_played"] > 0 else 0
+        # Show errors if any occurred
+        if stats.get("errors", 0) > 0 or stats.get("chip_accounting_errors", 0) > 0:
+            self.warning("Errors detected during simulation:")
+            self.warning(f"  Total errors: {stats.get('errors', 0)}")
+            self.warning(
+                f"  Chip accounting errors: {stats.get('chip_accounting_errors', 0)}"
             )
-            final_chips = stats["final_chips"][player_name]
-            print(f"  {player_name}:")
-            print(f"    Wins: {wins} ({win_percentage:.1f}%)")
-            print(f"    Final chips: {self._format_chips(final_chips)}")
+            self.info("")
 
-        # Error summary
-        if stats.get("errors", 0) > 0:
-            print(f"\nTotal errors detected: {stats['errors']}")
-        print("")
+        self.info("Player Actions:")
+        self.info(f"  Folds:   {stats.get('folds', 0)}")
+        self.info(f"  Checks:  {stats.get('checks', 0)}")
+        self.info(f"  Calls:   {stats.get('calls', 0)}")
+        self.info(f"  Bets:    {stats.get('bets', 0)}")
+        self.info(f"  Raises:  {stats.get('raises', 0)}")
+        self.info(f"  All-ins: {stats.get('all_ins', 0)}")
+        self.info("")
+
+        self.info("Final Results:")
+        for player_name, wins in stats["player_wins"].items():
+            # Format player name with elimination status
+            display_name = player_name
+            if stats.get("eliminated", {}).get(player_name, False):
+                display_name = f"{player_name} (eliminated)"
+
+            # Get final chips
+            final_chips = stats["final_chips"].get(player_name, 0)
+
+            # Calculate win percentage
+            win_percentage = 0
+            if stats["hands_played"] > 0:
+                win_percentage = (wins / stats["hands_played"]) * 100
+
+            self.info(f"  {display_name}:")
+            self.info(f"    Wins: {wins} ({win_percentage:.1f}%)")
+            self.info(f"    Final chips: ${final_chips}")
 
     # Methods for displaying information to human players
     def display_information_set(self, info_set: InfoSet) -> None:

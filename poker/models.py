@@ -112,7 +112,7 @@ class Action:
 
 
 class InformationSet:
-    def __init__(self) -> None:
+    def __init__(self, big_blind: int = 0, small_blind: int = 0) -> None:
         self.community_cards: List[Card] = []
         self.pot: int = 0
         self.current_bet: int = 0
@@ -123,6 +123,8 @@ class InformationSet:
         self.active_player: Optional["Agent"] = None
         self.num_active_players: int = 0
         self.min_call_amount: int = 0
+        self.big_blind: int = big_blind
+        self.small_blind: int = small_blind
 
     def add_action(self, action: Action) -> None:
         self.action_history.append(action)

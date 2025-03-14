@@ -6,6 +6,29 @@ from poker.models import Action, ActionType, Agent, Card, InformationSet
 
 
 class HumanPlayer(Agent):
+    """
+    Human player class that interacts with the game through the console.
+    """
+
+    def __init__(self, name: str, initial_chips: int = 1000) -> None:
+        """
+        Initialize a human player.
+
+        Args:
+            name: Player name
+            chips: Starting chip count
+        """
+        super().__init__(name, initial_chips)
+        self.display_mode = "text"  # Default to text mode
+
+    def __repr__(self) -> str:
+        """String representation of the human player."""
+        return f"HumanPlayer(name='{self.name}', chips={self.chips})"
+
+    def __str__(self) -> str:
+        """String representation of the human player for display."""
+        return self.name
+
     # Card suit colors
     SUIT_COLORS = {"♥": Fore.RED, "♦": Fore.RED, "♠": Fore.WHITE, "♣": Fore.WHITE}
 
